@@ -1,9 +1,13 @@
+import React, {useContext} from "react";
 import { Container } from "./style";
 import imgIcon from '../../assets/android-icon-48x48.png'
+import { TransactionsContext } from "../../TransactionsContext";
 
 
 
 export function Summary() {
+    const {transactions} = useContext(TransactionsContext)
+console.log(transactions)
     return (
         <Container>
            <div>

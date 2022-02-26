@@ -1,10 +1,13 @@
 import Modal from 'react-modal';
-import { Container, RadioBox, TransactionsTypeContainer } from './style';
+import { FormEvent, useState, useContext } from 'react';
+import { api } from '../../services/api';
+import { TransactionsContext } from '../../TransactionsContext';
+
 import iconIMG from '../../assets/android-icon-48x48.png'
 import outiconImg from '../../assets/android-icon-48x48.png'
 import closeImg from '../../assets/android-icon-48x48.png'
-import { FormEvent, useState } from 'react';
-import { api } from '../../services/api';
+
+import { Container, RadioBox, TransactionsTypeContainer } from './style';
 
 
 interface NewTransactionsModalProps {
@@ -16,16 +19,26 @@ interface NewTransactionsModalProps {
 
 export function NewTransactionsModal(
     { isOpen, onRequestClose }: NewTransactionsModalProps) {
+
+        const { createTransactions } = useContext(TransactionsContext);
+
     const [type, setType] = useState('deposito')
     const [title, setTitle] = useState('')
-    const [value, setValue] = useState(0)
+    const [amount, setAmount] = useState(0)
     const [category, setCategory] = useState('')
 
     //Evitar carregamneto pagina(Submit)
-    function handleCreateNewTransactions(event: FormEvent) {
+    // Recebendo o async para a function close
+   async function handleCreateNewTransactions(event: FormEvent) {
         event.preventDefault()
-        const data = {title, value, category, type}
-        api.post('/transactions', data)
+
+       await createTransactions({
+            title,
+            amount,
+            category,
+            type,
+        })
+        onRequestClose();
     }
 
 
@@ -41,7 +54,7 @@ export function NewTransactionsModal(
 
             <input placeholder='Titulo' value={title} onChange={ev => setTitle(ev.target.value)} />
 
-            <input type="number" placeholder='Valor' value={value} onChange={ev => setValue(Number(ev.target.value))} />
+            <input type="number" placeholder='Valor' value={amount} onChange={ev => setAmount(Number(ev.target.value))} />
 
             <TransactionsTypeContainer>
                 <RadioBox type='button' onClick={() => setType('deposito')} isActive={type === 'deposito'} activeColor="green">
