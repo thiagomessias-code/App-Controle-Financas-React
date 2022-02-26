@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
-import { api } from './services/api';
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { api } from '../services/api';
 
 interface Transactions {
     id: number;
@@ -28,9 +28,9 @@ interface TransactionsContextData {
     createTransactions: (transactions: TransactionsInput) => Promise<void>;  //Metodo Promise para adicionar async na function do post
 }
 
-export const TransactionsContext = createContext<TransactionsContextData>(
+ const TransactionsContext = createContext<TransactionsContextData>(
     {} as TransactionsContextData
-    );
+);
 
 
 export function TransactionsProvider({ children }: TransactiosnProviderProps) {
@@ -42,13 +42,29 @@ export function TransactionsProvider({ children }: TransactiosnProviderProps) {
         //Lembrar sempre de adicionar a propriedade para o data solicitado.
     }, [])
 
-    async function createTransactions(transactions: TransactionsInput) {
-     await   api.post('/transactions', transactions)
+    async function createTransactions(transactionsInput: TransactionsInput) {
+        const response = await api.post('/transactions', {
+            ...transactionsInput,
+            createAt: new Date(),
+        })
+
+        const { transaction } = response.data;
+
+        setTransactions([
+            ...transactions,
+            transaction,
+        ])
     }
 
     return (
-        <TransactionsContext.Provider value={{transactions, createTransactions}}>
+        <TransactionsContext.Provider value={{ transactions, createTransactions }}>
             {children}
         </TransactionsContext.Provider>
     )
+}
+
+export function useTransactions() {
+const context = useContext(TransactionsContext);
+
+return context
 }

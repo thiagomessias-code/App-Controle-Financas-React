@@ -1,13 +1,15 @@
 import Modal from 'react-modal';
-import { FormEvent, useState, useContext } from 'react';
-import { api } from '../../services/api';
-import { TransactionsContext } from '../../TransactionsContext';
+import { FormEvent, useState,  } from 'react';
+import { useTransactions } from '../../hooks/useTransactions';
+
+
 
 import iconIMG from '../../assets/android-icon-48x48.png'
 import outiconImg from '../../assets/android-icon-48x48.png'
 import closeImg from '../../assets/android-icon-48x48.png'
 
 import { Container, RadioBox, TransactionsTypeContainer } from './style';
+
 
 
 interface NewTransactionsModalProps {
@@ -20,24 +22,32 @@ interface NewTransactionsModalProps {
 export function NewTransactionsModal(
     { isOpen, onRequestClose }: NewTransactionsModalProps) {
 
-        const { createTransactions } = useContext(TransactionsContext);
+    const { createTransactions } = useTransactions();
 
-    const [type, setType] = useState('deposito')
-    const [title, setTitle] = useState('')
-    const [amount, setAmount] = useState(0)
-    const [category, setCategory] = useState('')
+    
+    const [title, setTitle] = useState('');
+    const [amount, setAmount] = useState(0);
+    const [category, setCategory] = useState('');
+    const [type, setType] = useState('deposito');
 
     //Evitar carregamneto pagina(Submit)
     // Recebendo o async para a function close
-   async function handleCreateNewTransactions(event: FormEvent) {
+    async function handleCreateNewTransactions(event: FormEvent) {
         event.preventDefault()
 
-       await createTransactions({
+        await createTransactions({
             title,
             amount,
             category,
             type,
         })
+
+        // Resetar os valores dos inputs após o Request
+        setTitle('');
+        setAmount(0);
+        setCategory('')
+        setType("deposito")
+
         onRequestClose();
     }
 
